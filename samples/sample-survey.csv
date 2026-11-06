@@ -1,6 +1,9 @@
-Question,Type,Choices
-How did you hear about us?,single,Search engine; Social media; Friend or colleague; Other (please specify)
-Which of our products have you used?,multi,Mobile app; Website; Desktop software; None of the above
-How satisfied are you with our service overall?,single,Very satisfied; Satisfied; Neutral; Dissatisfied; Very dissatisfied
-Which country do you live in?,dropdown,India; United States; United Kingdom; Other
-Is there anything else you would like to tell us?,text,
+Question,Type,Choices,Section,Required,Help text
+How did you hear about us?,single,Search engine; Social media; Friend or colleague; Other (please specify),About you,Yes,
+Which country do you live in?,dropdown,India; United States; United Kingdom; Other,About you,Yes,
+Which of our products have you used?,checkbox,Mobile app; Website; Desktop software; None of the above,Your experience,No,Select all that apply
+How much do you agree with each statement?,Likert,The app is easy to use; Support answers quickly; Prices are fair,Your experience,No,
+How satisfied are you overall?,Rating 1-5,,Your experience,Yes,"1 = very unsatisfied, 5 = very satisfied"
+Rank these features by importance,Rank,Speed; Price; Design; Support,Your experience,No,
+How likely are you to recommend us?,NPS,,Your experience,No,
+Anything else you would like to tell us?,Long text (max 200 words),,Final comments,No,

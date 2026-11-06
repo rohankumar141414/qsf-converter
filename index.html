@@ -12,71 +12,109 @@
   <header class="top">
     <div class="wrap">
       <h1>QSF Converter</h1>
-      <p class="lede">Turn a questionnaire in Word, PDF, text or Excel into a Qualtrics survey file (.qsf). Everything runs in your browser — your files are never uploaded.</p>
+      <p class="lede">Turn a questionnaire in Word, PDF, text or Excel into a Qualtrics survey file (.qsf). Everything runs in your browser. Your files are never uploaded.</p>
     </div>
   </header>
 
   <main class="wrap">
-    <section class="card" id="step-input">
-      <h2><span class="num">1</span> Add your questionnaire</h2>
+    <!-- Step 1: plan -->
+    <section class="card" id="step-plan">
+      <div class="row-between">
+        <h2><span class="num">1</span> Which Qualtrics account do you have?</h2>
+        <button type="button" class="link" id="changePlan" hidden>Change</button>
+      </div>
+      <div id="planChoices" class="plans" role="radiogroup" aria-label="Qualtrics plan">
+        <button type="button" class="plan" data-plan="free" role="radio" aria-checked="false">
+          <strong>Free account</strong>
+          <span>Only the question types a free Qualtrics account can use. File upload, signature and CAPTCHA are swapped for text boxes.</span>
+        </button>
+        <button type="button" class="plan" data-plan="paid" role="radio" aria-checked="false">
+          <strong>Paid or university / organisation licence</strong>
+          <span>All question types, including file upload, signature and CAPTCHA.</span>
+        </button>
+      </div>
+      <p class="hint small" id="planNote">Not sure? Choose <b>Free</b>. It works on every account, and you can switch later without losing your edits.</p>
+      <p class="plan-chosen" id="planChosen" hidden></p>
+    </section>
+
+    <!-- Step 2: input -->
+    <section class="card" id="step-input" hidden>
+      <h2><span class="num">2</span> Add your questionnaire</h2>
       <label id="drop" class="drop" tabindex="0">
         <input id="file" type="file" accept=".docx,.pdf,.txt,.text,.md,.xlsx,.xls,.xlsm,.csv,.tsv,.ods" hidden>
         <strong>Drop a file here or click to choose</strong>
         <span>.docx · .pdf · .txt · .xlsx / .xls · .csv</span>
       </label>
-      <details class="paste">
-        <summary>…or paste text instead</summary>
-        <textarea id="paste" rows="8" placeholder="1. What is your gender?&#10;a) Male&#10;b) Female&#10;&#10;2. Which apps do you use? (Select all that apply)&#10;- Email&#10;- Chat"></textarea>
-        <button type="button" class="btn" id="parsePaste">Convert pasted text</button>
-      </details>
+      <div class="alt-actions">
+        <details class="paste">
+          <summary>Paste text instead</summary>
+          <textarea id="paste" rows="8" placeholder="1. What is your gender?&#10;a) Male&#10;b) Female&#10;&#10;2. Which apps do you use? (Select all that apply)&#10;- Email&#10;- Chat"></textarea>
+          <button type="button" class="btn" id="parsePaste">Convert pasted text</button>
+        </details>
+        <button type="button" class="link" id="startBlank">Or start from scratch</button>
+      </div>
       <p id="status" class="status" role="status" aria-live="polite"></p>
 
       <details class="guide">
         <summary>How should my file be formatted?</summary>
         <div class="guide-body">
+          <h3>Excel / CSV (recommended for forms)</h3>
+          <p>One row per question. Column names are flexible. These are all recognised:</p>
+          <table class="mini">
+            <tr><th>Column</th><th>Also recognised as</th><th>What goes in it</th></tr>
+            <tr><td>Question</td><td>Field Name, Label, Item, Prompt</td><td>The question text (required)</td></tr>
+            <tr><td>Type</td><td>Field Type, Question Type, Format</td><td>Text, Long Text (Max 500 words), Dropdown, Checkbox, Radio, Yes/No, Date, Email, Phone, Number, Matrix, Likert, Slider 0-10, Rating 1-5, Stars, Rank, NPS, Constant sum 100, Form, Descriptive, File Upload (PDF), Signature</td></tr>
+            <tr><td>Choices</td><td>Options, Answers, Values</td><td>Separated by <code>;</code> <code>|</code> <code>/</code> or new lines. Or use columns Choice 1, Choice 2, …</td></tr>
+            <tr><td>Section</td><td>Category, Block, Group, Part</td><td>Each section becomes a Qualtrics block with its own page and heading</td></tr>
+            <tr><td>Required</td><td>Mandatory, Compulsory</td><td>Yes / No</td></tr>
+            <tr><td>Help text</td><td>Description, Guidance, Hint, Notes</td><td>Shown under the question. For dropdowns and choice questions, a list like <code>Male / Female / Other</code> is read as the choices.</td></tr>
+            <tr><td>ID</td><td>Field ID, Variable, Code</td><td>Used as the Qualtrics export tag (e.g. F01)</td></tr>
+            <tr><td>Scale</td><td>Columns</td><td>Matrix column labels</td></tr>
+          </table>
           <h3>Word, PDF and text files</h3>
           <ul>
-            <li>Start each question with a number: <code>1.</code> <code>1)</code> <code>Q1</code> or <code>Question 1:</code></li>
-            <li>Put each answer choice on its own line, starting with a letter or bullet: <code>a)</code> <code>(b)</code> <code>c.</code> <code>-</code> <code>•</code> <code>☐</code> — or no marker at all if the question ends with <code>?</code> or <code>:</code></li>
-            <li>Leave a blank line between questions.</li>
-            <li>Questions containing “select all that apply”, “check all”, or using <code>☐</code> boxes become <b>multiple-answer</b>. Everything else is <b>single-answer</b>.</li>
-            <li>Optional tags at the end of a question: <code>[multi]</code> <code>[single]</code> <code>[dropdown]</code> <code>[text]</code></li>
-            <li>A choice like “Other (please specify)” gets a text box automatically.</li>
+            <li>Start each question with a number: <code>1.</code> <code>1)</code> <code>Q1</code> or <code>Question 1:</code>. Word's automatic numbering works too.</li>
+            <li>Put each answer choice on its own line, starting with <code>a)</code> <code>(b)</code> <code>-</code> <code>•</code> <code>☐</code>, or with no marker if the question ends in <code>?</code> or <code>:</code></li>
+            <li>Sections: a heading like <code>Section A: About you</code>, a Word heading, or a bold line.</li>
+            <li>Mark required questions with <code>*</code> or <code>(required)</code> at the end.</li>
+            <li>Set the type with a tag at the end: <code>[dropdown]</code> <code>[multi]</code> <code>[email]</code> <code>[date]</code> <code>[number]</code> <code>[long text max 300 words]</code> <code>[matrix]</code> <code>[rank]</code> <code>[nps]</code> <code>[slider 0-10]</code> <code>[stars]</code> <code>[constant sum 100]</code> <code>[file]</code> <code>[signature]</code></li>
+            <li>Matrix: list the statements as choices and add a line <code>Scale: Disagree / Neutral / Agree</code>. In Word, a table with the scale across the top row and statements down the first column also works.</li>
+            <li>Questions with no choices are guessed from their wording (email, phone, date, number, long answer) and otherwise become short text boxes.</li>
           </ul>
-<pre>1. What is your gender?
-a) Male
-b) Female
-c) Prefer not to say
+<pre>Section A: About you
+
+1. Email address *
 
 2. Which devices do you own? (Select all that apply)
 - Phone
 - Laptop
-- Other (please specify)</pre>
-          <h3>Excel and CSV files</h3>
-          <p>Use the first sheet with a header row. Required: a <b>Question</b> column. Optional: a <b>Type</b> column (single, multi, dropdown, text) and either a <b>Choices</b> column (separated by <code>;</code> or <code>|</code>) or one column per choice (<b>Choice 1</b>, <b>Choice 2</b>, …).</p>
-          <table class="mini">
-            <tr><th>Question</th><th>Type</th><th>Choices</th></tr>
-            <tr><td>What is your gender?</td><td>single</td><td>Male; Female; Prefer not to say</td></tr>
-            <tr><td>Which devices do you own?</td><td>multi</td><td>Phone; Laptop; Tablet</td></tr>
-          </table>
-          <p>No header row? Column A is read as the question and the remaining columns as choices.</p>
-          <p><a href="samples/sample-survey.txt" download>Sample .txt</a> · <a href="samples/sample-survey.csv" download>Sample .csv</a> · <a href="samples/sample-survey.xlsx" download>Sample .xlsx</a> · <a href="samples/sample-survey.docx" download>Sample .docx</a></p>
+- Other (please specify)
+
+3. How much do you agree? [matrix]
+Scale: Disagree / Neutral / Agree
+- The app is easy to use
+- Prices are fair</pre>
+          <p>Samples: <a href="samples/sample-application-form.xlsx" download>Application form .xlsx</a> · <a href="samples/sample-survey.xlsx" download>Survey .xlsx</a> · <a href="samples/sample-survey.csv" download>.csv</a> · <a href="samples/sample-survey.docx" download>.docx</a> · <a href="samples/sample-survey.txt" download>.txt</a></p>
         </div>
       </details>
     </section>
 
+    <!-- Step 3: review -->
     <section class="card" id="step-review" hidden>
       <div class="row-between">
-        <h2><span class="num">2</span> Review and edit</h2>
+        <h2><span class="num">3</span> Review and edit</h2>
         <span id="count" class="pill"></span>
       </div>
-      <p class="hint">Check what was detected. You can fix question text, change the type, edit choices (one per line), reorder or delete questions.</p>
+      <p class="hint">Check what was detected. You can change any question's type, text, help text, section or required setting, and reorder or delete questions. Each section becomes its own Qualtrics block.</p>
+      <div id="warnSummary" class="warn-summary" hidden></div>
       <div id="questions"></div>
       <button type="button" class="btn ghost" id="addQ">+ Add question</button>
+      <datalist id="sectionList"></datalist>
     </section>
 
+    <!-- Step 4: export -->
     <section class="card" id="step-export" hidden>
-      <h2><span class="num">3</span> Download for Qualtrics</h2>
+      <h2><span class="num">4</span> Download for Qualtrics</h2>
       <div class="grid">
         <label class="field">Survey name
           <input id="surveyName" type="text" value="Imported Survey">
@@ -86,55 +124,56 @@ c) Prefer not to say
         </label>
         <label class="field">Questions per page
           <select id="perPage">
-            <option value="0">All on one page</option>
+            <option value="0">Whole section on one page</option>
             <option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="10">10</option>
           </select>
         </label>
       </div>
       <div class="checks">
+        <label><input type="checkbox" id="sectionTitles" checked> Show section headings to respondents</label>
         <label><input type="checkbox" id="forceResponse"> Make every question required</label>
         <label><input type="checkbox" id="horizontal"> Show choices horizontally</label>
         <label><input type="checkbox" id="randomize"> Randomize choice order</label>
-        <label><input type="checkbox" id="essay"> Text questions use a large essay box</label>
         <label><input type="checkbox" id="backButton"> Show a Back button</label>
       </div>
+      <p id="planWarn" class="warn-summary" hidden></p>
       <button type="button" class="btn primary" id="download">Download .qsf</button>
       <div class="howto">
         <h3>Import into Qualtrics</h3>
         <ol>
-          <li>In Qualtrics, choose <b>Create a new project → Survey → From a file</b> (or open an existing survey and use <b>Tools → Import/Export → Import survey</b>).</li>
+          <li>In Qualtrics, choose <b>Create a new project → Survey → From a file</b> (or, in an existing survey, <b>Tools → Import/Export → Import survey</b>).</li>
           <li>Upload the downloaded <code>.qsf</code> file.</li>
-          <li>Review the survey in the editor and publish.</li>
+          <li>Check the survey in the editor. Date questions use Qualtrics' date check; choose the date format (e.g. DD/MM/YYYY) in the question's validation settings. File upload size and file-type limits are also set there.</li>
         </ol>
       </div>
     </section>
   </main>
 
   <footer class="wrap foot">
-    <p>Free and open source. Files are processed locally in your browser. Not affiliated with Qualtrics.</p>
+    <p>Free and open source. Files are processed locally in your browser. Not affiliated with Qualtrics. Which question types a free account allows can change, so check in Qualtrics if an import fails.</p>
   </footer>
 
   <template id="qTpl">
     <article class="q">
+      <div class="q-section-head" hidden></div>
       <div class="q-head">
         <span class="q-num"></span>
-        <select class="q-type" aria-label="Question type">
-          <option value="single">Single answer</option>
-          <option value="multi">Multiple answers</option>
-          <option value="dropdown">Dropdown</option>
-          <option value="text">Text entry</option>
-        </select>
+        <select class="q-type" aria-label="Question type"></select>
         <label class="q-req"><input type="checkbox" class="q-required"> Required</label>
         <span class="q-tools">
           <button type="button" class="icon up" title="Move up" aria-label="Move up">↑</button>
           <button type="button" class="icon down" title="Move down" aria-label="Move down">↓</button>
+          <button type="button" class="icon dup" title="Duplicate" aria-label="Duplicate question">⧉</button>
           <button type="button" class="icon del" title="Delete" aria-label="Delete question">✕</button>
         </span>
       </div>
-      <textarea class="q-text" rows="2" aria-label="Question text"></textarea>
-      <label class="q-choices-label">Answer choices (one per line)
-        <textarea class="q-choices" rows="4"></textarea>
-      </label>
+      <textarea class="q-text" rows="2" aria-label="Question text" placeholder="Question text"></textarea>
+      <input type="text" class="q-help" aria-label="Help text" placeholder="Help text shown under the question (optional)">
+      <div class="q-fields"></div>
+      <div class="q-meta">
+        <label>Section <input type="text" class="q-section" list="sectionList" placeholder="(same as previous)"></label>
+        <label>Export tag <input type="text" class="q-tag" placeholder="auto"></label>
+      </div>
       <p class="q-warn" hidden></p>
     </article>
   </template>
@@ -142,6 +181,7 @@ c) Prefer not to say
   <script src="vendor/mammoth.browser.min.js"></script>
   <script src="vendor/pdf.min.js"></script>
   <script src="vendor/xlsx.full.min.js"></script>
+  <script src="js/types.js"></script>
   <script src="js/parser.js"></script>
   <script src="js/qsf.js"></script>
   <script src="js/app.js"></script>

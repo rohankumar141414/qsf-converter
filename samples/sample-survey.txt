@@ -1,30 +1,20 @@
 Customer Feedback Survey
 
-1. How did you hear about us?
-a) Search engine
-b) Social media
-c) Friend or colleague
-d) Other (please specify)
+Thank you for taking part. This survey takes about 5 minutes.
 
-2. Which of our products have you used? (Select all that apply)
-- Mobile app
-- Website
-- Desktop software
-- None of the above
+Section A: About you
 
-3. How satisfied are you with our service overall?
-(a) Very satisfied
-(b) Satisfied
-(c) Neutral
-(d) Dissatisfied
-(e) Very dissatisfied
+1. Full name *
+
+2. Email address *
+
+3. Date of birth
 
 4. Your age group:
-Under 18
-18-24
-25-34
-35-44
-45 or older
+a) Under 18
+b) 18-24
+c) 25-34
+d) 35 or older
 
 5. Which country do you live in? [dropdown]
 India
@@ -32,4 +22,30 @@ United States
 United Kingdom
 Other
 
-6. Is there anything else you would like to tell us?
+Section B: Your experience
+
+6. Which of our products have you used? (Select all that apply)
+- Mobile app
+- Website
+- Desktop software
+- None of the above
+
+7. How much do you agree with each statement? [matrix]
+Scale: Strongly disagree / Disagree / Neutral / Agree / Strongly agree
+- The app is easy to use
+- Support answers quickly
+- Prices are fair
+
+8. Rank these features from most to least important [rank]
+- Speed
+- Price
+- Design
+- Support
+
+9. How likely are you to recommend us to a friend? [nps]
+
+10. How satisfied are you overall? [slider 0-10]
+
+11. Please describe any problems you have had. [long text max 200 words]
+
+12. Upload a screenshot of the problem (optional) [file]
