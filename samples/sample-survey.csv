@@ -1,0 +1,6 @@
+Question,Type,Choices
+How did you hear about us?,single,Search engine; Social media; Friend or colleague; Other (please specify)
+Which of our products have you used?,multi,Mobile app; Website; Desktop software; None of the above
+How satisfied are you with our service overall?,single,Very satisfied; Satisfied; Neutral; Dissatisfied; Very dissatisfied
+Which country do you live in?,dropdown,India; United States; United Kingdom; Other
+Is there anything else you would like to tell us?,text,

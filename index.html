@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QSF Converter</title>
+  <meta name="description" content="Convert Word, PDF, text and Excel questionnaires into Qualtrics .qsf survey files, right in your browser.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232f5bd3'/><path d='M9 11h14M9 16h10M9 21h12' stroke='white' stroke-width='2.5' stroke-linecap='round'/></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <h1>QSF Converter</h1>
+      <p class="lede">Turn a questionnaire in Word, PDF, text or Excel into a Qualtrics survey file (.qsf). Everything runs in your browser — your files are never uploaded.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card" id="step-input">
+      <h2><span class="num">1</span> Add your questionnaire</h2>
+      <label id="drop" class="drop" tabindex="0">
+        <input id="file" type="file" accept=".docx,.pdf,.txt,.text,.md,.xlsx,.xls,.xlsm,.csv,.tsv,.ods" hidden>
+        <strong>Drop a file here or click to choose</strong>
+        <span>.docx · .pdf · .txt · .xlsx / .xls · .csv</span>
+      </label>
+      <details class="paste">
+        <summary>…or paste text instead</summary>
+        <textarea id="paste" rows="8" placeholder="1. What is your gender?&#10;a) Male&#10;b) Female&#10;&#10;2. Which apps do you use? (Select all that apply)&#10;- Email&#10;- Chat"></textarea>
+        <button type="button" class="btn" id="parsePaste">Convert pasted text</button>
+      </details>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+
+      <details class="guide">
+        <summary>How should my file be formatted?</summary>
+        <div class="guide-body">
+          <h3>Word, PDF and text files</h3>
+          <ul>
+            <li>Start each question with a number: <code>1.</code> <code>1)</code> <code>Q1</code> or <code>Question 1:</code></li>
+            <li>Put each answer choice on its own line, starting with a letter or bullet: <code>a)</code> <code>(b)</code> <code>c.</code> <code>-</code> <code>•</code> <code>☐</code> — or no marker at all if the question ends with <code>?</code> or <code>:</code></li>
+            <li>Leave a blank line between questions.</li>
+            <li>Questions containing “select all that apply”, “check all”, or using <code>☐</code> boxes become <b>multiple-answer</b>. Everything else is <b>single-answer</b>.</li>
+            <li>Optional tags at the end of a question: <code>[multi]</code> <code>[single]</code> <code>[dropdown]</code> <code>[text]</code></li>
+            <li>A choice like “Other (please specify)” gets a text box automatically.</li>
+          </ul>
+<pre>1. What is your gender?
+a) Male
+b) Female
+c) Prefer not to say
+
+2. Which devices do you own? (Select all that apply)
+- Phone
+- Laptop
+- Other (please specify)</pre>
+          <h3>Excel and CSV files</h3>
+          <p>Use the first sheet with a header row. Required: a <b>Question</b> column. Optional: a <b>Type</b> column (single, multi, dropdown, text) and either a <b>Choices</b> column (separated by <code>;</code> or <code>|</code>) or one column per choice (<b>Choice 1</b>, <b>Choice 2</b>, …).</p>
+          <table class="mini">
+            <tr><th>Question</th><th>Type</th><th>Choices</th></tr>
+            <tr><td>What is your gender?</td><td>single</td><td>Male; Female; Prefer not to say</td></tr>
+            <tr><td>Which devices do you own?</td><td>multi</td><td>Phone; Laptop; Tablet</td></tr>
+          </table>
+          <p>No header row? Column A is read as the question and the remaining columns as choices.</p>
+          <p><a href="samples/sample-survey.txt" download>Sample .txt</a> · <a href="samples/sample-survey.csv" download>Sample .csv</a> · <a href="samples/sample-survey.xlsx" download>Sample .xlsx</a> · <a href="samples/sample-survey.docx" download>Sample .docx</a></p>
+        </div>
+      </details>
+    </section>
+
+    <section class="card" id="step-review" hidden>
+      <div class="row-between">
+        <h2><span class="num">2</span> Review and edit</h2>
+        <span id="count" class="pill"></span>
+      </div>
+      <p class="hint">Check what was detected. You can fix question text, change the type, edit choices (one per line), reorder or delete questions.</p>
+      <div id="questions"></div>
+      <button type="button" class="btn ghost" id="addQ">+ Add question</button>
+    </section>
+
+    <section class="card" id="step-export" hidden>
+      <h2><span class="num">3</span> Download for Qualtrics</h2>
+      <div class="grid">
+        <label class="field">Survey name
+          <input id="surveyName" type="text" value="Imported Survey">
+        </label>
+        <label class="field">Export tag prefix
+          <input id="tagPrefix" type="text" value="Q" maxlength="10">
+        </label>
+        <label class="field">Questions per page
+          <select id="perPage">
+            <option value="0">All on one page</option>
+            <option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="10">10</option>
+          </select>
+        </label>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" id="forceResponse"> Make every question required</label>
+        <label><input type="checkbox" id="horizontal"> Show choices horizontally</label>
+        <label><input type="checkbox" id="randomize"> Randomize choice order</label>
+        <label><input type="checkbox" id="essay"> Text questions use a large essay box</label>
+        <label><input type="checkbox" id="backButton"> Show a Back button</label>
+      </div>
+      <button type="button" class="btn primary" id="download">Download .qsf</button>
+      <div class="howto">
+        <h3>Import into Qualtrics</h3>
+        <ol>
+          <li>In Qualtrics, choose <b>Create a new project → Survey → From a file</b> (or open an existing survey and use <b>Tools → Import/Export → Import survey</b>).</li>
+          <li>Upload the downloaded <code>.qsf</code> file.</li>
+          <li>Review the survey in the editor and publish.</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <p>Free and open source. Files are processed locally in your browser. Not affiliated with Qualtrics.</p>
+  </footer>
+
+  <template id="qTpl">
+    <article class="q">
+      <div class="q-head">
+        <span class="q-num"></span>
+        <select class="q-type" aria-label="Question type">
+          <option value="single">Single answer</option>
+          <option value="multi">Multiple answers</option>
+          <option value="dropdown">Dropdown</option>
+          <option value="text">Text entry</option>
+        </select>
+        <label class="q-req"><input type="checkbox" class="q-required"> Required</label>
+        <span class="q-tools">
+          <button type="button" class="icon up" title="Move up" aria-label="Move up">↑</button>
+          <button type="button" class="icon down" title="Move down" aria-label="Move down">↓</button>
+          <button type="button" class="icon del" title="Delete" aria-label="Delete question">✕</button>
+        </span>
+      </div>
+      <textarea class="q-text" rows="2" aria-label="Question text"></textarea>
+      <label class="q-choices-label">Answer choices (one per line)
+        <textarea class="q-choices" rows="4"></textarea>
+      </label>
+      <p class="q-warn" hidden></p>
+    </article>
+  </template>
+
+  <script src="vendor/mammoth.browser.min.js"></script>
+  <script src="vendor/pdf.min.js"></script>
+  <script src="vendor/xlsx.full.min.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/qsf.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

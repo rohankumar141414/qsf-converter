@@ -1,0 +1,35 @@
+Customer Feedback Survey
+
+1. How did you hear about us?
+a) Search engine
+b) Social media
+c) Friend or colleague
+d) Other (please specify)
+
+2. Which of our products have you used? (Select all that apply)
+- Mobile app
+- Website
+- Desktop software
+- None of the above
+
+3. How satisfied are you with our service overall?
+(a) Very satisfied
+(b) Satisfied
+(c) Neutral
+(d) Dissatisfied
+(e) Very dissatisfied
+
+4. Your age group:
+Under 18
+18-24
+25-34
+35-44
+45 or older
+
+5. Which country do you live in? [dropdown]
+India
+United States
+United Kingdom
+Other
+
+6. Is there anything else you would like to tell us?
